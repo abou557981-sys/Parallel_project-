@@ -1,2 +1,3 @@
 bin/
 results/*.ppm
+__pycache__/

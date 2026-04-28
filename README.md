@@ -89,3 +89,13 @@ Environment overrides:
 convert results/mandelbrot_seq.ppm results/mandelbrot_seq.png
 ```
 
+
+## Google Colab (CUDA)
+
+A ready-to-run Colab setup is included in `colab/`:
+
+- `colab/run_in_colab.sh`
+- `colab/display_ppm.py`
+- `colab/mandelbrot_colab.ipynb`
+
+See `colab/README.md` for step-by-step usage.
