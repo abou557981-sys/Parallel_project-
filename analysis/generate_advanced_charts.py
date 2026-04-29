@@ -60,7 +60,7 @@ def benchmark(cfg: RunConfig, out_csv: Path) -> list[dict]:
     ]
 
     if cfg.include_mpi:
-        mpi_cmd = ["mpirun", "-np", "{ranks}"]
+        mpi_cmd = ["mpirun", "--oversubscribe", "-np", "{ranks}"]
         if hasattr(os, "geteuid") and os.geteuid() == 0:
             mpi_cmd.append("--allow-run-as-root")
         mpi_cmd.append("./bin/mandelbrot_mpi")

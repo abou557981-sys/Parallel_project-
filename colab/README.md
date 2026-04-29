@@ -73,6 +73,7 @@ What it does:
 - writes CUDA image (`results/mandelbrot_cuda_colab.png`)
 
 - If OpenMPI warns about running as root in Colab, this workflow already handles it automatically (`--allow-run-as-root` + `OMPI_ALLOW_RUN_AS_ROOT*` env vars).
+- If OpenMPI reports insufficient slots, the benchmark runner already uses `--oversubscribe` automatically.
 
 Optional tuning:
 
