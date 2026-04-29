@@ -60,7 +60,11 @@ def benchmark(cfg: RunConfig, out_csv: Path) -> list[dict]:
     ]
 
     if cfg.include_mpi:
-        binaries.append(("mpi", ["mpirun", "-np", "{ranks}", "./bin/mandelbrot_mpi"]))
+        mpi_cmd = ["mpirun", "-np", "{ranks}"]
+        if hasattr(os, "geteuid") and os.geteuid() == 0:
+            mpi_cmd.append("--allow-run-as-root")
+        mpi_cmd.append("./bin/mandelbrot_mpi")
+        binaries.append(("mpi", mpi_cmd))
 
     seq_baseline = None
 
@@ -87,6 +91,9 @@ def benchmark(cfg: RunConfig, out_csv: Path) -> list[dict]:
                 env = os.environ.copy()
                 if name == "openmp":
                     env["OMP_NUM_THREADS"] = str(pval)
+                if name == "mpi" and hasattr(os, "geteuid") and os.geteuid() == 0:
+                    env["OMPI_ALLOW_RUN_AS_ROOT"] = "1"
+                    env["OMPI_ALLOW_RUN_AS_ROOT_CONFIRM"] = "1"
                 if name == "pthreads":
                     cmd.extend(["--threads", str(pval)])
 

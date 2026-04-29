@@ -24,7 +24,7 @@ python3 analysis/generate_advanced_charts.py \
 if command -v mpicc >/dev/null 2>&1 && command -v mpirun >/dev/null 2>&1; then
   echo "[INFO] MPI detected: building and running MPI-inclusive charts"
   make mpi
-  python3 analysis/generate_advanced_charts.py \
+  OMPI_ALLOW_RUN_AS_ROOT=1 OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1 python3 analysis/generate_advanced_charts.py \
     --width "$WIDTH" --height "$HEIGHT" --max-iter "$MAX_ITER" \
     --trials "$TRIALS" --threads "$THREADS" \
     --include-mpi --mpi-ranks "$MPI_RANKS" --output-dir results/charts_cpu_mpi

@@ -72,6 +72,8 @@ What it does:
 - builds/runs CUDA if GPU + `nvcc` are present
 - writes CUDA image (`results/mandelbrot_cuda_colab.png`)
 
+- If OpenMPI warns about running as root in Colab, this workflow already handles it automatically (`--allow-run-as-root` + `OMPI_ALLOW_RUN_AS_ROOT*` env vars).
+
 Optional tuning:
 
 ```bash
