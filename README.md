@@ -99,3 +99,15 @@ A ready-to-run Colab setup is included in `colab/`:
 - `colab/mandelbrot_colab.ipynb`
 
 See `colab/README.md` for step-by-step usage.
+
+
+## Advanced charts (downloadable)
+
+Generate detailed, publication-ready performance dashboards:
+
+```bash
+make cpu
+python3 analysis/generate_advanced_charts.py --width 1920 --height 1080 --max-iter 1000 --trials 5 --threads 1,2,4,8
+```
+
+Outputs are saved in `results/charts/` and packaged as `results/charts.zip` for easy download/sharing. See `analysis/README.md` for full options and Colab download instructions.
