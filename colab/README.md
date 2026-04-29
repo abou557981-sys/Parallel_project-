@@ -55,3 +55,35 @@ If you see linker errors like:
 - `undefined reference to write_ppm(...)`
 
 make sure you are on the latest commit. That error came from missing C/C++ linkage guards in the shared header when CUDA (`.cu`) code linked against C utilities. The current version includes the fix (`extern "C"` guards in `include/mandelbrot_common.h`).
+
+
+## Run all backends in Colab (recommended)
+
+Use this one command to run everything available in your Colab runtime:
+
+```bash
+!bash colab/run_all_in_colab.sh
+```
+
+What it does:
+- builds and runs CPU backends (sequential, OpenMP, pthreads)
+- generates advanced charts + ZIP bundle (`results/charts_cpu.zip`)
+- runs MPI too if `mpicc`/`mpirun` exist
+- builds/runs CUDA if GPU + `nvcc` are present
+- writes CUDA image (`results/mandelbrot_cuda_colab.png`)
+
+Optional tuning:
+
+```bash
+!WIDTH=1920 HEIGHT=1080 MAX_ITER=1000 THREADS=2,4,8 MPI_RANKS=2,4 TRIALS=3 bash colab/run_all_in_colab.sh
+```
+
+Download outputs in Colab:
+
+```python
+from google.colab import files
+files.download('results/charts_cpu.zip')
+# Optional:
+# files.download('results/charts_cpu_mpi.zip')
+# files.download('results/mandelbrot_cuda_colab.png')
+```

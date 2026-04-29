@@ -100,6 +100,8 @@ A ready-to-run Colab setup is included in `colab/`:
 
 See `colab/README.md` for step-by-step usage.
 
+For running all available backends in Colab with one command, use `bash colab/run_all_in_colab.sh`.
+
 
 ## Advanced charts (downloadable)
 
