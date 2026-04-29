@@ -46,3 +46,12 @@ display(Image('results/mandelbrot_cuda_colab.png'))
 
 - `run_in_colab.sh` — checks GPU/CUDA toolchain, builds, and runs CUDA executable.
 - `display_ppm.py` — converts PPM output to PNG for easy preview.
+
+## Troubleshooting
+
+If you see linker errors like:
+
+- `undefined reference to default_config()`
+- `undefined reference to write_ppm(...)`
+
+make sure you are on the latest commit. That error came from missing C/C++ linkage guards in the shared header when CUDA (`.cu`) code linked against C utilities. The current version includes the fix (`extern "C"` guards in `include/mandelbrot_common.h`).

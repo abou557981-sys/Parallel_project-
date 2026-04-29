@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     int width;
     int height;
@@ -23,5 +27,9 @@ int mandelbrot_iterations(double cx, double cy, int max_iter);
 RGB mandelbrot_colorize(int iter, int max_iter);
 int write_ppm(const char *filename, const RGB *pixels, int width, int height);
 MandelbrotConfig default_config(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
