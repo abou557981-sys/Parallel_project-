@@ -1,94 +1,101 @@
-# Parallel Computation of the Mandelbrot Set with Color-Encoded Iteration Depth
+# Parallel Mandelbrot Project
 
-## Selected Dataset
+This repository now includes **full working implementations** of Mandelbrot generation using:
 
-This project uses a 2D grid of complex numbers over the plane, where each point is defined as:
+- Sequential C (baseline)
+- OpenMP
+- POSIX Threads (pthreads)
+- MPI
+- CUDA
 
-\[
-c = x + iy
-\]
+Each variant computes Mandelbrot iteration depth per pixel and writes a colorized **PPM image**.
 
-For each point \((x, y)\), we compute a third value: the number of iterations required before divergence under the Mandelbrot recurrence. This produces a dataset of the form:
+## Project Layout
 
-\[
-(x, y, \text{iterations})
-\]
+- `include/mandelbrot_common.h`: shared config/types/util API
+- `src/mandelbrot_common.c`: shared Mandelbrot math + color mapping + PPM output
+- `src/mandelbrot_seq.c`: sequential baseline
+- `src/mandelbrot_omp.c`: OpenMP parallel loops
+- `src/mandelbrot_pthreads.c`: pthread worker partitioning
+- `src/mandelbrot_mpi.c`: MPI row distribution + gather
+- `src/mandelbrot_cuda.cu`: CUDA kernel implementation
+- `scripts/benchmark.sh`: one-shot CPU+MPI benchmark runner
+- `Makefile`: builds all targets into `bin/`
 
-The third component is represented through color mapping rather than physical depth.
+## Build
 
-## Problem Definition
+```bash
+make            # builds cpu + mpi + cuda targets
+```
 
-The Mandelbrot iteration is:
+If CUDA is not installed on your machine, build only CPU/MPI:
 
-\[
-z_{n+1} = z_n^2 + c, \quad z_0 = 0
-\]
+```bash
+make cpu mpi
+```
 
-A point is considered to diverge when:
+## Run
 
-\[
-|z_n| > 2
-\]
+### Sequential
 
-The iteration count at divergence (or a maximum iteration cap if no divergence occurs) is stored per pixel and later mapped to a color scale.
+```bash
+./bin/mandelbrot_seq --width 1920 --height 1080 --max-iter 1000 --output results/mandelbrot_seq.ppm
+```
 
-## Why This Project
+### OpenMP
 
-- Computationally expensive and highly parallelizable.
-- Well-suited to compare multiple parallel programming models on the same workload.
-- Direct mapping from independent pixel computations to thread/process-based execution.
-- Compatible with both CPU and GPU acceleration.
-- Produces a visually interpretable result (fractal image).
+```bash
+OMP_NUM_THREADS=8 ./bin/mandelbrot_omp --width 1920 --height 1080 --max-iter 1000 --output results/mandelbrot_omp.ppm
+```
 
-## Planned Implementations
+### Pthreads
 
-### 1) Sequential (Baseline)
+```bash
+./bin/mandelbrot_pthreads --threads 8 --width 1920 --height 1080 --max-iter 1000 --output results/mandelbrot_pthreads.ppm
+```
 
-- Standard nested-loop traversal over image rows and columns.
-- Computes iteration counts pixel by pixel on a single core.
-- Serves as the timing baseline for speedup analysis.
+### MPI
 
-### 2) OpenMP
+```bash
+mpirun -np 4 ./bin/mandelbrot_mpi --width 1920 --height 1080 --max-iter 1000 --output results/mandelbrot_mpi.ppm
+```
 
-- Parallelizes outer loops (typically rows) using shared-memory threads.
-- Uses scheduling strategies (e.g., static/dynamic) for load balancing.
-- Measures thread-level scalability on multicore CPUs.
+### CUDA
 
-### 3) Pthreads
+```bash
+./bin/mandelbrot_cuda --width 1920 --height 1080 --max-iter 1000 --output results/mandelbrot_cuda.ppm
+```
 
-- Manual thread creation and explicit workload partitioning.
-- Assigns row or block ranges per thread.
-- Provides low-level control for synchronization and scheduling experiments.
+## Benchmark Helper
 
-### 4) MPI
+```bash
+scripts/benchmark.sh
+```
 
-- Distributes image regions across multiple processes (single node or cluster).
-- Uses scatter/gather-style coordination to collect final image data.
-- Evaluates distributed-memory scaling and communication overhead.
+Environment overrides:
 
-### 5) CUDA
+- `WIDTH` (default `1920`)
+- `HEIGHT` (default `1080`)
+- `MAX_ITER` (default `1000`)
+- `THREADS` (default `8`)
+- `MPI_RANKS` (default `4`)
 
-- Maps each pixel to a GPU thread.
-- Executes Mandelbrot iterations in parallel on CUDA cores.
-- Compares GPU throughput against CPU-based implementations.
+## Notes
 
-## Expected Outputs
+- Output images are PPM (`P6`) for minimal dependencies and fast writing.
+- Use ImageMagick to convert to PNG if desired:
 
-- High-resolution Mandelbrot image.
-- Color-encoded visualization of iteration depth.
-- Execution-time measurements for each implementation.
-- Comparative charts/tables of performance.
+```bash
+convert results/mandelbrot_seq.ppm results/mandelbrot_seq.png
+```
 
-## Performance Evaluation Criteria
 
-- **Execution time** (absolute runtime per implementation).
-- **Speedup** relative to sequential baseline:
-  \[
-  S_p = \frac{T_1}{T_p}
-  \]
-- **Scalability** with increasing threads/processes/problem size.
-- **CPU vs GPU comparison** for throughput and efficiency.
+## Google Colab (CUDA)
 
-## Conclusion
+A ready-to-run Colab setup is included in `colab/`:
 
-This project demonstrates how a mathematically simple but computationally intensive task can be accelerated using multiple parallel paradigms. The Mandelbrot set naturally forms a data-parallel workload, and iteration-depth color encoding provides both quantitative and visual insight into performance and correctness.
+- `colab/run_in_colab.sh`
+- `colab/display_ppm.py`
+- `colab/mandelbrot_colab.ipynb`
+
+See `colab/README.md` for step-by-step usage.
